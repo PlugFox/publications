@@ -1,0 +1,551 @@
+Процедура ЗаполнитьЧат(ЧатСтрокой) Экспорт
+	ЧатСтрокой	= ПолучитьМакетЧата();
+КонецПроцедуры // ЗаполнитьЧат()
+
+Процедура sendMessage(ТекущийОтправительСтрокой, Сообщение, ТекущаяГруппаСтрокой, Знач Тема = Неопределено, Знач Дата = Неопределено) Экспорт
+	Если ПустаяСтрока(ТекущийОтправительСтрокой) Или ПустаяСтрока(Сообщение) Или ПустаяСтрока(ТекущаяГруппаСтрокой) Тогда Возврат КонецЕсли;
+	
+	Участники	= ?(Участники = Неопределено, ПредопределенноеЗначение("Справочник.ГруппыУчастников.ПустаяСсылка"), Участники);
+	Тема		= ?(Тема = Неопределено, ПредопределенноеЗначение("Справочник.ТемаЧатаПредметЗадачи.ПустаяСсылка"), Тема);
+	Дата		= ?(Дата = Неопределено, ТекущаяДата(), Дата);
+	Структура	= Новый Структура("Период,Сообщение,Тема", 
+									Дата, Сообщение, Тема, Дата);
+	Сообщение	= "";	
+	ЧатНаСервере.СоздатьСообщение(Структура, ТекущийОтправительСтрокой, ТекущаяГруппаСтрокой);
+КонецПроцедуры // СоздатьСообщение()
+
+Функция reloadChat(Дата, ТекущаяГруппаСтрокой, ТекущийОтправительСтрокой) Экспорт
+	Возврат ЧатНаСервере.ПолучитьМассивСообщенийJSON(?(Дата="undefined" Или ПустаяСтрока(Дата), Неопределено, Дата(Дата)+1), Неопределено, ТекущаяГруппаСтрокой, ТекущийОтправительСтрокой);
+КонецФункции // ЗаполнитьЧат()
+
+Функция getGroups() Экспорт
+	Возврат ЧатНаСервере.ПолучитьМассивГруппJSON();		
+КонецФункции // getGroups()
+
+Функция getSenders(ТекущаяГруппаСтрокой) Экспорт
+	Возврат ЧатНаСервере.ПолучитьСписокОтправителей(ТекущаяГруппаСтрокой);	
+КонецФункции // getSenders()
+
+Функция ПолучитьМакетЧата()
+	МакетЧата	= "<!DOCTYPE html>
+	|<HTML lang='ru-RU'>
+	|<HEAD>
+	|    <TITLE>Чат</TITLE>
+	|    <META charset='utf-8'>
+	|    <META http-equiv='X-UA-Compatible' content='IE=11'>
+	|    <STYLE type=text/css>
+	|        BODY {
+	|            MARGIN: 0px;
+	|            background: -moz-linear-gradient(-45deg, #c7ddf9 0%, #fff 100%);
+	|            background: -webkit-linear-gradient(-45deg, #c7ddf9 0%,#fff 100%);
+	|            background: linear-gradient(135deg, #c7ddf9 0%,#fff 100%);
+	|            filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#c7ddf9', endColorstr='#fff',GradientType=1 );
+	|            background-attachment: fixed;
+	|        }
+	|        p {
+	|            text-indent: 5px;
+	|            white-space: pre-wrap;
+	|            word-wrap: break-word;
+	|            word-break: break-all;
+	|            FONT: 12px 'Consolas';
+	|            letter-spacing: -0.5px;
+	|            PADDING: 0 10px 0 10px;
+	|            TEXT-ALIGN: left;
+	|            MARGIN: 0 0 10px 0;
+	|        }
+	|        form#chat {
+	|            position: absolute;
+	|            height: 100%;
+	|            width: 100%;
+	|            -webkit-appearance: none;
+	|            -moz-appearance: none;
+	|            appearance: none;
+	|            text-overflow: '';
+	|            display: none; /* table; */
+	|        }
+	|        div#msgbox {
+	|            position: relative;
+	|            display: table-cell;
+	|            vertical-align: bottom;
+	|            width: 100%;
+	|            bottom: 0;
+	|            float: left;
+	|        }
+	|        div.msg {
+	|            POSITION: relative;
+	|            clear: both;
+	|            PADDING: 7px 10px 2px 10px;
+	|            MARGIN-TOP: 5px;
+	|            MARGIN-BOTTOM: 5px;
+	|            MAX-WIDTH: 75%;
+	|            BORDER: #a0a0a0 1px solid;
+	|            box-shadow: 0 0 1px rgba(0,0,0,0.5);
+	|        }
+	|        div.msg:hover {
+	|            cursor: pointer;
+	|        }
+	|        div.msg.left:before {
+	|            content: ' ';
+	|            position: absolute;
+	|            width: 0;
+	|            height: 0;
+	|            bottom: 2px;
+	|            border: 4px solid;
+	|            right: 100%;
+	|            border-color: transparent #a0a0a0 #a0a0a0 transparent;
+	|        }
+	|        div.msg.right:before {
+	|            content: ' ';
+	|            position: absolute;
+	|            width: 0;
+	|            height: 0;
+	|            bottom: 2px;
+	|            border: 4px solid;
+	|            left: 100%;
+	|            border-color: transparent transparent #a0a0a0 #a0a0a0;
+	|        }
+	|        .left {
+	|            BACKGROUND: #f1f6fd;;
+	|            MARGIN: 0 5px 0 7px;
+	|            TEXT-ALIGN: left;
+	|            FLOAT: left;
+	|            border-radius: 5px;
+	|            -moz-border-radius: 5px;
+	|            -webkit-border-radius: 5px;
+	|            COLOR: #3d2815;
+	|        }
+	|        .right {
+	|            BACKGROUND: #ccffc3;
+	|            MARGIN: 0 7px 0 5px;
+	|            TEXT-ALIGN: right;
+	|            FLOAT: right;
+	|            border-radius: 5px;
+	|            -moz-border-radius: 5px;
+	|            -webkit-border-radius: 5px;
+	|            COLOR: black;
+	|        }
+	|        div.date{
+	|            POSITION: relative;
+	|            clear: both;
+	|            PADDING: 2px;
+	|            MARGIN-TOP: 5px;
+	|            MARGIN-BOTTOM: 5px;
+	|            margin-left: auto;
+	|            margin-right: auto;
+	|            border-bottom: 1px solid #808080;
+	|            FONT: 9px 'Segoe UI Semibold', serif;
+	|            color: #808080;
+	|            TEXT-ALIGN: center;
+	|            width: 90%;
+	|            display: block;
+	|        }
+	|        div.date:hover {
+	|            cursor: pointer;
+	|        }
+	|        p.sender {
+	|            FONT: 12px 'Segoe UI Semibold', serif;
+	|            COLOR: #993300;
+	|            PADDING: 0px;
+	|            MARGIN: 0px;
+	|        }
+	|        span.time {
+	|            COLOR: #666;
+	|            MARGIN-TOP: 10px;
+	|            MARGIN-RIGHT: -15px;
+	|            FONT: 10px 'Segoe UI Semibold', serif;
+	|            FLOAT: right;
+	|        }
+	|        div#msgWhiteSpace {
+	|            position: relative;
+	|            float: left;
+	|            height: 50px;
+	|            width: 100%;
+	|        }
+	|        div#goDown {
+	|            position: fixed;
+	|            height: 30px;
+	|            width: 30px;
+	|            display: block;
+	|            -moz-border-radius: 15px;
+	|            -webkit-border-radius: 15px;
+	|            border-radius: 15px;
+	|            top: 20px;
+	|            left: 20px;
+	|            text-align: center;
+	|            font-size: 28px;
+	|            box-shadow: 0 0 5px rgb(0,0,0);
+	|            -moz-user-select: none;
+	|            -webkit-user-select: none;
+	|            cursor: pointer;
+	|            font-weight: lighter;
+	|            color: #8c8c8c;
+	|            outline:none;
+	|        }
+	|        div#goDown:hover {
+	|            color: black;
+	|        }
+	|        div#goDown:active {
+	|            box-shadow: 0 0 15px rgb(0,0,0);
+	|            color: black;
+	|        }
+	|        div#curGroup {
+	|            FONT: 10px 'Segoe UI Semibold', serif;
+	|            position: fixed;
+	|            height: 14px;
+	|            min-width: 60px;
+	|            display: block;
+	|            -moz-border-radius: 7px;
+	|            -webkit-border-radius: 7px;
+	|            border-radius: 7px;
+	|            top: 10px;
+	|            right: 10px;
+	|            text-align: center;
+	|            box-shadow: 0 0 5px rgb(0,0,0);
+	|            -moz-user-select: none;
+	|            -webkit-user-select: none;
+	|            cursor: pointer;
+	|            font-weight: lighter;
+	|            color: #8c8c8c;
+	|            outline:none;
+	|            padding: 0 5px;
+	|        }
+	|        div#curGroup:hover {
+	|            color: black;
+	|        }
+	|        div#curGroup:active {
+	|            box-shadow: 0 0 15px rgb(0,0,0);
+	|            color: black;
+	|        }
+	|        form#submitform {
+	|            height: 30px;
+	|            width: 100%;
+	|            position: fixed;
+	|            display: none; /* flex; */
+	|            bottom: 10px;
+	|            text-align: center;
+	|        }
+	|        select#selectSender {
+	|		     position: fixed;
+	|		     left: 50%;
+	|		     transform: translate(-50%, 0);
+	|		     bottom: 40px;
+	|            outline:none;
+	|            background: none;
+	|            FONT: 12px 'Segoe UI Semibold', serif;
+	|			 color: blue;
+	|            padding: 0px;
+	|            border: none;
+	|            display: block;
+	|            overflow: hidden;
+	|            cursor: pointer;
+	|            -webkit-appearance: none;
+	|            -moz-appearance: none;
+	|            appearance: none;
+	|            text-align: center;
+	|            text-align-last: center;
+	|        }
+	|        select#selectSender::-ms-expand {
+	|            display: none;
+	|        }
+	|        textarea#message {
+	|            outline:none;
+	|            float: left;
+	|            background: white;
+	|            resize: none; 
+	|            height: 28px;
+	|            FONT: 12px 'Segoe UI Semibold', serif;
+	|            text-align: left;
+	|            padding: 0px 10px;
+	|            margin: 0 0 0 10px;
+	|            border: 1px solid black;
+	|            display: block;
+	|            flex: 1;
+	|            -moz-border-radius: 7px 0 0 7px;
+	|            -webkit-border-radius: 7px 0 0 7px;
+	|            border-radius: 7px 0 0 7px;
+	|            overflow: hidden;
+	|        }
+	|        input#submit {
+	|            outline: none;
+	|            float: left;
+	|            display: block;
+	|            width: 40px;
+	|            height: 30px;
+	|            background: rgba(0, 160, 227, 0.25);
+	|            border: 1px solid black;
+	|            text-align: center;
+	|            margin-left: 2px;
+	|            margin-right: 10px;
+	|            -moz-border-radius: 0px 7px 7px 0px;
+	|            -webkit-border-radius: 0px 7px 7px 0px;
+	|            border-radius: 0px 7px 7px 0px;
+	|            cursor: pointer;
+	|            font-size: 26px;
+	|            /* padding-bottom: 1px; */
+	|            /* padding-top: 0;		*/
+	|            padding: 0;
+	|            z-index: 2;
+	|        }
+	|        input#submit:hover {
+	|            background: rgba(0, 160, 227, 0.5);
+	|        }
+	|        input#submit:active {
+	|            background: #00A0E3;
+	|        }
+	|        div#divGroups {
+	|            position: fixed;
+	|            height: 100%;
+	|            width: 100%;
+	|            margin: 0;
+	|            display: block;
+	|        }
+	|        ul#ulGroups {
+	|            height: 100%;
+	|            width: 100%;
+	|            overflow: auto;
+	|            margin: 0;
+	|            padding: 0;
+	|            text-align: center;
+	|        }
+	|        ul#ulGroups>li {
+	|            list-style-type: none;
+	|            FONT: 12px 'Segoe UI Semibold';	/* Шрифт */
+	|            padding: 7px;                      /* Отступ текста */
+	|            margin: 0 10px;					/* Отступ от краев */
+	|        }
+	|        ul#ulGroups>li:hover {
+	|            cursor: pointer;
+	|            background: rgb(254, 152, 152);	/* Цвет полосы */
+	|        }
+	|    </STYLE>
+	|    <SCRIPT type=text/javascript>
+	|        /* var externalForm = null; */
+	|        var externalModule = null;
+	|        var timer = null;
+	|        var lastDate = null;
+	|        var curGroup = '';
+	|        var curSender = null;
+	|        onload = function onLoadChat() {
+	|            /* При загрузке чата */
+	|        }
+	|        function getHeight(){
+	|            return Math.max(
+	|                document.body.scrollHeight, document.documentElement.scrollHeight,
+	|                document.body.offsetHeight, document.documentElement.offsetHeight,
+	|                document.body.clientHeight, document.documentElement.clientHeight
+	|            )
+	|        }
+	|        function scrollBottom(){
+	|            window.scrollTo(0, getHeight())
+	|        }
+	|        function startTimer() {
+	|            timer = setInterval(function()
+	|            {
+	|                getMessages()
+	|            }, 5000);
+	|        }
+	|        function stopTimer() {
+	|            clearInterval(timer);
+	|        }
+	|        function sendMessage()
+	|        {
+	|            var newMessage = document.getElementById('message').value;
+	|            if (newMessage != '') {
+	|                if (externalModule == null) {
+	|                    console.error('В переменную чата \u0022externalModule\u0022 не передан ОбщийМодуль \u0022Чат\u0022 1с');
+	|                    return;
+	|                    stopTimer();
+	|                }
+	|                if (curGroup == '') {
+	|                    alert('Не выбрана текущая группа.');
+	|                    stopTimer();
+	|                    return;
+	|                }
+	|                if (curSender == null) {
+	|                    alert('Не выбран отправитель сообщения.');
+	|                    stopTimer();
+	|                    return;
+	|                }
+	|                externalModule.sendMessage(curSender, newMessage, curGroup);
+	|                document.getElementById('message').value = '';
+	|                getMessages();
+	|            }
+	|        }
+	|        function getMessages() {
+	|            if (externalModule == null) {
+	|                stopTimer();
+	|                console.error('В переменную чата \u0022externalModule\u0022 не передан ОбщийМодуль \u0022Чат\u0022 1с');
+	|                return;
+	|            }
+	|            if (curGroup == '') return;
+	|            // Получаем либо от последнего значения, либо с самого начала
+	|            if (document.getElementById('msgbox').lastChild == null) {
+	|                var lastChildValue = '';
+	|            } else {
+	|                var lastChildValue = '' + document.getElementById('msgbox').lastChild.value;
+	|            }
+	|            var jsonData = externalModule.reloadChat(lastChildValue, curGroup, curSender);
+	|            var messagesData = JSON.parse(jsonData);
+	|            if (messagesData.length == 0) return;
+	|            for (var counter in messagesData) {
+	|                var messageData = messagesData[counter];
+	|                addMessage(messageData.Сообщение, messageData.Отправитель, new Date(messageData.Дата));
+	|            }
+	|            scrollBottom();
+	|        }
+	|        function addMessage(MsgText, SenderText, Date) {
+	|            if ((Date.getFullYear() * 10000 + (Date.getMonth() + 1) * 100 + Date.getDate()) > lastDate) {
+	|                lastDate = (Date.getFullYear() * 10000 + (Date.getMonth() + 1) * 100 + Date.getDate());
+	|                addDate(Date.getDate() , (Date.getMonth() + 1) , Date.getFullYear());
+	|            }
+	|            var divMsg = document.createElement('div');
+	|            divMsg.classList.add('msg');
+	|            divMsg.classList.add(SenderText == '' ? 'right' : 'left'); // Math.random() >= 0.5 ? 'right' : 'left'
+	|            divMsg.value = '' + Date.getFullYear() + ('0' + (Date.getMonth() + 1)).slice(-2)
+	|                + ('0' + Date.getDate()).slice(-2) + ('0' + Date.getHours()).slice(-2)
+	|                + ('0' + Date.getMinutes()).slice(-2) + ('0' + Date.getSeconds()).slice(-2);
+	|            var pSender = document.createElement('p');
+	|            pSender.classList.add('sender');
+	|            var pSenderText = document.createTextNode(SenderText);
+	|            pSender.appendChild(pSenderText);
+	|            divMsg.appendChild(pSender);
+	|            var pMsg = document.createElement('p');
+	|            var pMsgText = document.createTextNode(MsgText);
+	|            pMsg.appendChild(pMsgText);
+	|            divMsg.appendChild(pMsg);
+	|            var spanTime = document.createElement('span');
+	|            spanTime.classList.add('time');
+	|            var spanTimeText = document.createTextNode(Date.getHours() + ':' + ('0' + Date.getMinutes()).slice(-2));
+	|            spanTime.appendChild(spanTimeText);
+	|            pMsg.appendChild(spanTime);
+	|            document.getElementById('msgbox').appendChild(divMsg);
+	|        }
+	|        function addDate(dateD, dateM, dateY) {
+	|            aMonth = 'января,февраля,марта,апреля,мая,июня,июля,августа,сентября,октября,ноября,декабря'.split(',');
+	|            dateM = aMonth[dateM-1];
+	|            var divDate = document.createElement('div');
+	|            divDate.classList.add('date');
+	|            var divDateText = document.createTextNode('' + dateD + ' ' + dateM + ' ' + dateY);
+	|            divDate.appendChild(divDateText);
+	|            document.getElementById('msgbox').appendChild(divDate);
+	|        }
+	|        function getGroups() {
+	|            if (externalModule == null) {
+	|                stopTimer();
+	|                console.error('В переменную чата \u0022externalModule\u0022 не передан ОбщийМодуль \u0022Чат\u0022 1с');
+	|                return;
+	|            }
+	|            // Очищаем переменные
+	|            lastDate = '';
+	|            curGroup = '';
+	|            stopTimer();
+	|            timer = '';
+
+	|            clearChat();
+
+	|            document.getElementById('divGroups').style.display = 'block';
+	|            document.getElementById('chat').style.display = 'none';
+	|            document.getElementById('submitform').style.display = 'none';
+
+	|            // Удаляем дочерние ulGroups
+	|            var ulGroups = document.getElementById('ulGroups');
+	|            while (ulGroups.firstChild) {
+	|                ulGroups.removeChild(ulGroups.firstChild);
+	|            }
+	|            var jsonData = externalModule.getGroups();
+	|            var groupsData = JSON.parse(jsonData);
+	|            if (groupsData.length == 0) return;
+	|            for (var counter in groupsData) {
+	|                var groupData = groupsData[counter];
+	|                var li = document.createElement('li');
+	|                var liText = document.createTextNode(groupData);
+	|                li.appendChild(liText);
+	|                ulGroups.appendChild(li);
+	|            }
+	|            if (groupsData.length == 1) {
+	|                curGroup = groupData;
+	|                loadChatWithGroup();
+	|            }
+	|        }
+	|        function getSenders() {
+	|            if (externalModule == null) {
+	|                stopTimer();
+	|                console.error('В переменную чата \u0022externalModule\u0022 не передан ОбщийМодуль \u0022Чат\u0022 1с');
+	|                return;
+	|            }
+	|            // Удаляем дочерние selectSender
+	|            var selectSender = document.getElementById('selectSender');
+	|            while (selectSender.firstChild) {
+	|                selectSender.removeChild(selectSender.firstChild);
+	|            }
+	
+	|            var jsonData = externalModule.getSenders(curGroup);
+	|            var sendersData = JSON.parse(jsonData);
+	|            for (var counter in sendersData) {
+	|                var optionSender = document.createElement('option');
+	|                optionSender.value = sendersData[counter];
+	|                var optionSenderText = document.createTextNode(sendersData[counter]);
+	|                optionSender.appendChild(optionSenderText);
+	|                selectSender.appendChild(optionSender);
+	|            }
+	|            setSender();
+	|        }
+	|        function setSender() {
+	|            curSender = document.getElementById('selectSender').value;
+	|            clearChat();
+	|            getMessages();
+	|        }
+	|        function getEventTarget(e) {
+	|            e = e || window.event;
+	|            return e.target || e.srcElement;
+	|        }
+	|        function setGroup(event) {
+	|            var target = getEventTarget(event);
+	|            if (target == undefined || target.tagName.toUpperCase() != 'LI') return;
+	|            curGroup = String(target.innerHTML);;
+	|            loadChatWithGroup();
+	|        }
+	|        function loadChatWithGroup() {
+	|            document.getElementById('curGroup').innerHTML = 'Текущая группа: ' + curGroup;
+	|            document.getElementById('divGroups').style.display = 'none';
+	|            document.getElementById('chat').style.display = 'table';
+	|            document.getElementById('submitform').style.display = 'flex';
+	|            getSenders();
+	|            getMessages();
+	|            startTimer();
+	|        }
+	|        function clearChat() {
+	|            // Удаляем дочерние msgbox
+	|            var divMsgBox = document.getElementById('msgbox');
+	|            while (divMsgBox.firstChild) {
+	|                divMsgBox.removeChild(divMsgBox.firstChild);
+	|            }
+	|        }
+	|    </SCRIPT>
+	|</HEAD>
+	|<BODY>
+	|<form id='chat'>
+	|    <div id='msgbox'></div>
+	|    <div id='msgWhiteSpace'></div>
+	|</form>
+	|<form id='submitform'>
+	|    <div id='goDown'  unselectable='on' onclick='scrollBottom()'>&dArr;</div>
+	|    <div id='curGroup'  unselectable='on' onclick='getGroups()'></div>
+	|    <select id='selectSender' name='selectSender' onchange='setSender()'><option disabled>Выберите сотрудника</option></select>
+	|    <textarea id='message' name='message' cols='40' rows='2'></textarea>
+	|    <input id='submit' type='button' value='' onclick='sendMessage()'>
+	| 	 <svg version='1.1' id='Capa_1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' width='612px' height='612px' viewBox='0 0 612 612' style='width: 30px;height: 38px;bottom: 5px;position:  fixed;right: 15px;z-index: 1;' xml:space='preserve'>
+	|	 <g><path fill='#00A0E3' d='M306.768,346.814h0.131c4.615,0,9.176-1.339,12.866-3.777l1.001-0.643c0.218-0.142,0.446-0.271,0.675-0.424l11.658-9.645
+	|	 l278.259-229.624c-0.576-0.795-1.557-1.339-2.602-1.339H3.233c-0.751,0-1.448,0.272-2.003,0.729l291.125,239.954
+	|	 C296.024,345.083,301.259,346.814,306.768,346.814z M0,133.899v340.37l208.55-168.471L0,133.899z M403.668,306.941L612,474.356
+	|	 V135.031L403.668,306.941z M337.431,361.585c-8.305,6.814-19.168,10.57-30.576,10.57c-11.451,0-22.304-3.734-30.587-10.516
+	|	 l-47.765-39.394L0,506.806v0.587c0,1.753,1.502,3.244,3.276,3.244h605.491c1.741,0,3.232-1.491,3.232-3.255v-0.544L383.693,323.4
+	|	 L337.431,361.585z'></path></g></svg>
+	|</form>
+	|<div id='divGroups'>
+	|    <ul id='ulGroups' onclick='setGroup(event)'></ul>
+	|</div>
+	|</BODY>
+	|</HTML>";
+	Возврат МакетЧата;
+КонецФункции // ПолучитьМакетЧата()

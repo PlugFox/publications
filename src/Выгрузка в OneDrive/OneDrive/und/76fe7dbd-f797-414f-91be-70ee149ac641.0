@@ -1,0 +1,216 @@
+﻿{3,
+{48,0,1,0,0,1,0,0,00000000-0000-0000-0000-000000000000,1,
+{1,0},0,0,1,1,1,0,1,0,
+{2,3ccc650e-f631-4cae-8e33-3eaac610b5f9,"ПриОткрытии",9f2e5ddb-3492-4f5d-8f0d-416b8d1d5c5b,"",1,0,3ccc650e-f631-4cae-8e33-3eaac610b5f9,0,1,9f2e5ddb-3492-4f5d-8f0d-416b8d1d5c5b,0,1},
+{0},1,
+{22,
+{-1,02023637-7868-4a5f-8576-835a76e0c9ba},0,0,0,9,"ФормаКоманднаяПанель",
+{1,0},
+{1,0},0,1,0,0,0,2,2,
+{3,4,
+{0}
+},
+{7,3,0,1,100},
+{0,0,0},1,
+{0,0,0},0,1,0,0,0,3,3,0},1,77ffcc29-7f2d-4223-b22f-19666e7250ba,
+{34,
+{1,02023637-7868-4a5f-8576-835a76e0c9ba},0,0,1,
+{0,
+{0,
+{"B",1},0}
+},15,"HTML",0,0,
+{1,0},
+{1,0},
+{1,
+{2}
+},
+{0},1,0,2,0,2,
+{1,0},
+{1,0},1,1,0,3,0,3,1,3,0,
+{4,0,
+{0},"",-1,-1,1,0,""},
+{4,0,
+{0},"",-1,-1,1,0,""},
+{3,4,
+{0}
+},
+{7,3,0,1,100},
+{3,4,
+{0}
+},
+{3,4,
+{0}
+},
+{3,4,
+{0}
+},
+{7,3,0,1,100},
+{0,0,0},1,
+{3,50,10,
+{3,4,
+{0}
+},0,
+{2,53325f0c-b112-4c44-ab12-5d1ee0b1f07b,"HTMLДокументСформирован",da8dfb86-c5d1-4e35-a8a4-01b167a60ad3,"",1,0,53325f0c-b112-4c44-ab12-5d1ee0b1f07b,0,1,da8dfb86-c5d1-4e35-a8a4-01b167a60ad3,0,1},1,0,0,1,0,1,1},
+{1,fe115cc8-9e33-4684-a166-bd5136fe7a9f,"",1,0,fe115cc8-9e33-4684-a166-bd5136fe7a9f,0,1},1,
+{22,
+{2,02023637-7868-4a5f-8576-835a76e0c9ba},0,0,0,8,"HTMLКонтекстноеМеню",
+{1,0},
+{1,0},0,1,0,0,0,2,2,
+{3,4,
+{0}
+},
+{7,3,0,1,100},
+{0,0,0},1,
+{1,1},0,1,0,0,0,3,3,0},1,
+{"Pattern"},
+{"Pattern"},"","",
+{0},0,0,1,
+{11,
+{3,02023637-7868-4a5f-8576-835a76e0c9ba},0,0,0,0,"HTMLРасширеннаяПодсказка",
+{1,0},
+{1,0},1,0,0,2,2,
+{3,4,
+{0}
+},
+{7,3,0,1,100},
+{0,0,0},1,
+{5,0,0,3,0,
+{0,1,0},
+{3,4,
+{0}
+},
+{3,4,
+{0}
+},
+{3,0,
+{0},0,1,0,48312c09-257f-4b29-b280-284dd89efc1e}
+},0,1,2,
+{1,
+{1,0},0},0,0,1,0,0,1,0,3,3,0},3,3,0},"","",1,
+{22,
+{0},0,0,0,7,"Navigator",
+{1,0},
+{1,0},0,1,0,0,0,2,2,
+{3,4,
+{0}
+},
+{7,3,0,1,100},
+{0,0,0},0,0,1,0,1,
+{11,
+{0},0,0,0,0,"NavigatorExtendedTooltip",
+{1,0},
+{1,0},1,0,0,2,2,
+{3,4,
+{0}
+},
+{7,3,0,1,100},
+{0,0,0},1,
+{5,0,0,3,0,
+{0,1,0},
+{3,4,
+{0}
+},
+{3,4,
+{0}
+},
+{3,0,
+{0},0,1,0,48312c09-257f-4b29-b280-284dd89efc1e}
+},0,1,2,
+{1,
+{1,0},0},0,0,1,0,0,1,0,3,3,0},0,3,3,0},1,"",0,0,0,0,0,0,3,3,0,0,0,100,1,1,0,0,0},"&НаСервере
+Функция ПолучитьДанныеПодключения()
+	// https://apps.dev.microsoft.com/#/appList
+	// https://docs.microsoft.com/ru-ru/azure/active-directory/develop/v2-oauth2-auth-code-flow
+	appInfo			= Новый Структура(""clientId,redirectUri,scopes,authServiceUri,msGraphApiRoot,state""
+    , ""clientId""
+    , ""https://site.ru:443/base/hs/api/oauth2callback/""
+    , ""user.read files.readwrite files.readwrite.all offline_access""
+    , ""https://login.microsoftonline.com/common/oauth2/v2.0/authorize""
+	, ""https://graph.microsoft.com/v1.0/me""
+	, ПараметрыСеанса.ТекущийПользователь.ИдентификаторПользователяИБ);
+	
+	// Для implicit аутентификации: response_type=token
+	url	= СтрШаблон(""%1?client_id=%2&response_type=code&redirect_uri=%3&response_mode=query&scope=%4&state=%5""
+    , appInfo.authServiceUri
+    , appInfo.clientId
+    , КодироватьСтроку(appInfo.redirectUri, СпособКодированияСтроки.КодировкаURL)
+	, КодироватьСтроку(appInfo.scopes, СпособКодированияСтроки.КодировкаURL)	
+	, Строка(appInfo.state)
+	);
+	appInfo.Вставить(""OAuth2Adress"", url);
+	
+	Возврат appInfo;
+КонецФункции
+
+&НаКлиенте
+Процедура ПриОткрытии(Отказ)
+	ДанныеПодключения	= ПолучитьДанныеПодключения();
+	Элементы.HTML.Документ.location.href	= ДанныеПодключения.OAuth2Adress;
+КонецПроцедуры
+
+&НаКлиенте
+Процедура HTMLДокументСформирован(Элемент)
+	Если СтрНайти(Элемент.Документ.body.innerText, ""access_token="") Тогда
+		ЭтаФорма.Закрыть(СтроковыеФункцииКлиентСервер.ПолучитьПараметрыИзСтроки(Элемент.Документ.body.innerText).access_token);
+	КонецЕсли;
+КонецПроцедуры
+",
+{4,2,
+{9,
+{1},0,"Объект",
+{1,0},
+{"Pattern",
+{"#",02235a24-5292-4de9-875d-b83e537d61ab}
+},
+{0,
+{0,
+{"B",1},0}
+},
+{0,
+{0,
+{"B",1},0}
+},
+{0,0},
+{0,0},1,0,0,0,
+{0,0},
+{0,0}
+},
+{9,
+{2},0,"HTML",
+{1,1,
+{"ru","HTML"}
+},
+{"Pattern",
+{"S"}
+},
+{0,
+{0,
+{"B",1},0}
+},
+{0,
+{0,
+{"B",1},0}
+},
+{0,0},
+{0,0},0,0,0,0,
+{0,0},
+{0,0}
+},0,0,
+{#base64:77u/PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4NCjxTZXR0
+aW5ncyB4bWxucz0iaHR0cDovL3Y4LjFjLnJ1LzguMS9kYXRhLWNvbXBvc2l0aW9u
+LXN5c3RlbS9zZXR0aW5ncyIgeG1sbnM6ZGNzY29yPSJodHRwOi8vdjguMWMucnUv
+OC4xL2RhdGEtY29tcG9zaXRpb24tc3lzdGVtL2NvcmUiIHhtbG5zOnN0eWxlPSJo
+dHRwOi8vdjguMWMucnUvOC4xL2RhdGEvdWkvc3R5bGUiIHhtbG5zOnN5cz0iaHR0
+cDovL3Y4LjFjLnJ1LzguMS9kYXRhL3VpL2ZvbnRzL3N5c3RlbSIgeG1sbnM6djg9
+Imh0dHA6Ly92OC4xYy5ydS84LjEvZGF0YS9jb3JlIiB4bWxuczp2OHVpPSJodHRw
+Oi8vdjguMWMucnUvOC4xL2RhdGEvdWkiIHhtbG5zOndlYj0iaHR0cDovL3Y4LjFj
+LnJ1LzguMS9kYXRhL3VpL2NvbG9ycy93ZWIiIHhtbG5zOndpbj0iaHR0cDovL3Y4
+LjFjLnJ1LzguMS9kYXRhL3VpL2NvbG9ycy93aW5kb3dzIiB4bWxuczp4cz0iaHR0
+cDovL3d3dy53My5vcmcvMjAwMS9YTUxTY2hlbWEiIHhtbG5zOnhzaT0iaHR0cDov
+L3d3dy53My5vcmcvMjAwMS9YTUxTY2hlbWEtaW5zdGFuY2UiPg0KCTxvdXRwdXRQ
+YXJhbWV0ZXJzLz4NCjwvU2V0dGluZ3M+}
+},
+{0,0},
+{0,0},
+{0,0},
+{0,0},0,0}
