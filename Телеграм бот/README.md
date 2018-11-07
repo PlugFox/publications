@@ -6,9 +6,9 @@
 
 ## ОГЛАВЛЕНИЕ
 0. **ВМЕСТО ПРЕДИСЛОВИЯ**
-    + [Пример решаемой задачи](#problem)
-    + [Последовательность настройки](#tuningSequence)
-    + [Полезные ссылки](#usefulllinks)
+     + [Пример решаемой задачи](#problem)
+     + [Последовательность настройки](#tuningSequence)
+     + [Полезные ссылки](#usefulllinks)
 1. **1С REST СЕРВЕР**
     + [Инструкция настройки IIS 8.5 для 1Сv8.3](#iis)
     + [Проброс портов](#ports)
@@ -17,6 +17,7 @@
 2. **НАСТРОЙКА ПРОКСИ СЕРВЕРА**
     + [Аренда VPS сервера](#vps)
     + [Socks5 прокси с 3proxy](#3proxy)
+    + [MTProxy](#MTProxy)
     + [Создание сертификата](#cert)
     + [Проксирование запросов с nginx](#nginx)
     + [Настроим брандмауэр](#ufw)
@@ -140,6 +141,9 @@ https://wiki.archlinux.org/index.php/Nginx_(%D0%A0%D1%83%D1%81%D1%81%D0%BA%D0%B8
 
 // 3proxy socks5 proxy server
 https://www.3proxy.ru/
+
+// MTProxy
+https://github.com/TelegramMessenger/MTProxy
 ```
 
 
@@ -302,7 +306,61 @@ nano /etc/3proxy/.proxyauth
 {YourLogin3}:CL:{YourPassword3}
 ```
 
+### <a name="MTProxy"></a> MTProxy
+
+Вся настройка расписана в репозитории MTProxy телеграмма: 
+
+https://github.com/TelegramMessenger/MTProxy
+
+
+
+Поставим зависимости
+
+```apt install git curl build-essential libssl-dev zlib1g-dev```
+
+Клонируем репу и переходим в полученный каталог
+
+```
+git clone https://github.com/TelegramMessenger/MTProxy
+cd MTProxy
+```
+
+Собираем
+
+```
+make && cd objs/bin
+```
+
+Получаем секрет
+
+```
+curl -s https://core.telegram.org/getProxySecret -o proxy-secret
+```
+
+Получим конфигурацию
+
+```
+curl -s https://core.telegram.org/getProxyConfig -o proxy-multi.conf
+```
+
+Генерируем секрет для пользователей
+
+```
+head -c 16 /dev/urandom | xxd -ps
+```
+
+Запускаем
+
+```
+./mtproto-proxy -u nobody -p 8888 -H 443 -S <secret> --aes-pwd proxy-secret proxy-multi.conf -M 1
+```
+
+Желательно установить данное приложение как службу в вашем init или systemd.
+
+
+
 ### <a name="cert"></a> Создание сертификата
+
 SSL для работы применяет сочетание закрытого ключа и открытого сертификата. Ключ находится на сервере и доступа к нему нет. Сертификат же доступен всем пользователям, которые загружают контент с сервера. Для создания самоподписанного SSL и ключа нам нужно набрать в командной строке:
 
 ```
